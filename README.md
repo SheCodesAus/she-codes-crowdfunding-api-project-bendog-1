@@ -133,12 +133,78 @@ then run
     Created at: 20 Jan 23 04:15 UTC
 
     $ flyctl secrets set DATABASE_DIR='/dbvol/db.sqlite3'
+    Secrets are staged for the first deployment%   
     $ flyctl secrets set DJANGO_SUPERUSER_USERNAME='admin'
+    Secrets are staged for the first deployment%   
     $ flyctl secrets set DJANGO_SUPERUSER_EMAIL='ben@notmyemail.org'
+    Secrets are staged for the first deployment%   
     $ flyctl secrets set DJANGO_SUPERUSER_PASSWORD='very_secure_password'
+    Secrets are staged for the first deployment%   
 
 ## Step 5: Check it works!
 
     $ fly deploy
     $ fly open
 
+## Step 6: Add CORS
+
+update `requirements.txt`
+
+```
+...
+django-cors-headers==3.11.0
+```
+
+update your virtual environment 
+
+    $ pip install -r requirements.txt
+
+update `settings.py`
+
+```python
+
+...
+
+ALLOWED_HOSTS = ['rough-brook-8273.fly.dev']
+CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']
+
+...
+
+INSTALLED_APPS = [
+     'projects.apps.ProjectsConfig',
+     'rest_framework',
+     'rest_framework.authtoken',
+     'corsheaders',
+     'django.contrib.admin',
+     ...
+]
+
+...
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    ...
+]
+
+...
+```
+
+## Step 7: check it works
+
+    $ fly deploy
+    ==> Verifying app config
+    ...
+    $ fly open
+
+## Step 8: clean up your environment
+
+    $ flyctl secrets set DJANGO_DEBUG=False
+    Release v3 created
+    ...
+    $ flyctl secrets set DJANGO_SECRET_KEY='<your-secret-key>'
+    Release v4 created
+    ...
