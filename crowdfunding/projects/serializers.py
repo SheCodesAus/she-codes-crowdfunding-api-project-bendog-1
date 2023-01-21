@@ -20,6 +20,7 @@ class ProjectSerializer(serializers.Serializer):
     is_open = serializers.BooleanField()
     date_created = serializers.DateTimeField()
     owner = serializers.ReadOnlyField(source='owner_id')
+    total = serializers.ReadOnlyField()
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)

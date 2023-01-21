@@ -18,6 +18,10 @@ class Project(models.Model):
         related_name='owner_projects'
         )
 
+    @property
+    def total(self):
+        return self.pledges.aggregate(sum=models.Sum('amount'))['sum']
+
 
 class Pledge(models.Model):
     amount = models.IntegerField()
