@@ -17,6 +17,11 @@ class Project(models.Model):
         on_delete=models.CASCADE, 
         related_name='owner_projects'
         )
+    
+    liked_by = models.ManyToManyField(
+        User,
+        related_name='liked_projects'
+    )
 
     @property
     def total(self):
