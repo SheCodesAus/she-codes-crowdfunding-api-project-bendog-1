@@ -5,6 +5,9 @@ __pycache__/
 *.sqlite3
 *.vscode
 staticfiles
+
+
+
 .idea/aws.xml
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/misc.xml
