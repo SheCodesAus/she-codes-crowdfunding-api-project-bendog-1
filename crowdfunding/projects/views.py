@@ -19,9 +19,10 @@ class ProjectList(APIView):
     ]
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS  # this is DRF magic to get the defaults from settings.py
     filterset_fields = ['owner__username', 'is_open']
+    search_fields = ['title']
 
     def filter_queryset(self, queryset):
-        """ this is a copy of what the generic views do """
+        """ take a queryset and apply the filter backends above, this is a copy of what the generic views do """
         for backend in list(self.filter_backends):
             queryset = backend().filter_queryset(self.request, queryset, self)
         return queryset
