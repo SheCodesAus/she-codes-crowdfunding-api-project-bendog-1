@@ -1,210 +1,152 @@
-# Deployment to Fly.io
+# {{ my project title }}
 
-## Step 1: Install Fly, sign-up and create your app.
+{{ a paragraph detailing the purpose and target audience }}
 
-    $ brew install flyctl 
-    $ fly auth signup 
+## Features
 
-make sure credit card details are entered
+### User Accounts
 
-make sure you are in this directory
+- [X] Username
+- [X] Email Address
+- [X] Password
 
-    $ fly launch
-    Creating app in /Users/fitzbe/Documents/shecodes/code/she-codes-crowdfunding-api-project-bendog-1
-    Scanning source code
-    Detected a Django app
-    ? Choose an app name (leave blank to generate one): 
-    automatically selected personal organization: Ben Fitzhardinge
-    ? Choose a region for deployment: Sydney, Australia (syd)
-    Created app rough-brook-8273 in organization personal
-    Admin URL: https://fly.io/apps/rough-brook-8273
-    Hostname: rough-brook-8273.fly.dev
-    Set secrets on rough-brook-8273: SECRET_KEY
-    Wrote config file fly.toml
-    ? Would you like to set up a Postgresql database now? No
-    ? Would you like to set up an Upstash Redis database now? No
-    Your app is ready! Deploy with `flyctl deploy`
+### Project
 
-## Step 2: Configure fly to use your project code.
+- [X] Create a project
+  - [X] Title
+  - [X] Owner (a user)
+  - [X] Description
+  - [X] Image
+  - [X] Target Amount to Fundraise
+  - [X] Open/Close (Accepting new supporters)
+  - [X] When was the project created
+- [X] Ability to pledge to a project
+  - [X] An amount
+  - [X] The project the pledge is for
+  - [X] The supporter
+  - [X] Whether the pledge is anonymous
+  - [X] A comment to go with the pledge
+  
+### Implement suitable update delete
 
-update `Dockerfile`
-```Dockerfile
-...
-COPY crowdfunding/ /code/
+**Note: Not all of these may be required for your project, if you have not included one of these please justify why.**
 
-RUN python manage.py collectstatic --noinput
-RUN chmod +x /code/run.sh
+- Project
+  - [X] Create
+  - [X] Retrieve
+  - [ ] Update
+  - [ ] Destroy
+- Pledge
+  - [X] Create
+  - [X] Retrieve
+  - [ ] Update
+  - [ ] Destroy
+- User
+  - [X] Create
+  - [X] Retrieve
+  - [ ] Update
+  - [ ] Destroy
 
-EXPOSE 8000
+### Implement suitable permissions
 
-# replace demo.wsgi with <project_name>.wsgi
-CMD ["/code/run.sh"]
+**Note: Not all of these may be required for your project, if you have not included one of these please justify why.**
+
+- Project
+  - [ ] Limit who can create
+  - [ ] Limit who can retrieve
+  - [ ] Limit who can update
+  - [ ] Limit who can delete
+- Pledge
+  - [ ] Limit who can create
+  - [ ] Limit who can retrieve
+  - [ ] Limit who can update
+  - [ ] Limit who can delete
+- Pledge
+  - [ ] Limit who can retrieve
+  - [ ] Limit who can update
+  - [ ] Limit who can delete
+
+### Implement relevant status codes
+
+- [ ] Get returns 200
+- [ ] Create returns 201
+- [ ] Not found returns 404
+
+### Handle failed requests gracefully 
+
+- [ ] 404 response returns JSON rather than text
+
+### Use token authentication
+
+- [X] impliment /api-token-auth/
+
+## Additional features
+
+- [ ] {Title Feature 1}
+
+{{ description of feature 1 }}
+
+- [ ] {Title Feature 2}
+
+{{ description of feature 2 }}
+
+- [ ] {Title Feature 3}
+
+{{ description of feature 3 }}
+
+### External libraries used
+
+- [ ] django-filter
+
+
+## Part A Submission
+
+- [ ] A link to the deployed project.
+- [ ] A screenshot of Insomnia, demonstrating a successful GET method for any endpoint.
+- [ ] A screenshot of Insomnia, demonstrating a successful POST method for any endpoint.
+- [ ] A screenshot of Insomnia, demonstrating a token being returned.
+- [ ] Your refined API specification and Database Schema.
+
+### Step by step instructions for how to register a new user and create a new project (i.e. endpoints and body data).
+
+1. Create User
+
+```shell
+curl --request POST \
+  --url http://127.0.0.1:8000/users/ \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"username": "testuser",
+	"email": "not@myemail.com",
+	"password": "not-my-password"
+}'
 ```
 
-update `.dockerignore`
-```ignore
-fly.toml
-.git/
-*.sqlite3
-venv/
-*.pyc
-staticfiles/
+2. Sign in User
+
+```shell
+curl --request POST \
+  --url http://127.0.0.1:8000/api-token-auth/ \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"username": "testuser",
+	"password": "not-my-password"
+}'
 ```
 
-create `crowdfunding/run.sh`
-```bash
-#!/usr/bin/env bash
-python manage.py migrate
-python manage.py createsuperuser --no-input
-gunicorn --bind :8000 --workers 1 crowdfunding.wsgi
+3. Create Project
+
+```shell
+curl --request POST \
+  --url http://127.0.0.1:8000/projects/ \
+  --header 'Authorization: Token 5b8c82ec35c8e8cb1fac24f8eb6d480a367f322a' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"title": "Donate a cat",
+	"description": "Please help, we need a cat for she codes plus, our class lacks meows.",
+	"goal": 1,
+	"image": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Dollar_bill_and_small_change.jpg",
+	"is_open": true,
+	"date_created": "2023-01-28T05:53:46.113Z"
+}'
 ```
-
-## Step 3: Update your project to work with fly
-
-update your `requirements.txt`
-```
-Django==4.1.5
-djangorestframework==3.14.0
-gunicorn==20.1.0
-whitenoise==5.3.0
-```
-
-Update your virtual env in include these new packages
-
-    $ pip install -r requirements.txt
-
-update the `settings.py` file
-```python
-...
-
-import os
-
-...
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-6f5fiv53l$d=%d_0_8&znvd!6&d3rfy-qowzswx^u)i-p_dsm6'
-)
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG') != 'False'
-
-ALLOWED_HOSTS = ['rough-brook-8273.fly.dev']
-
-...
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    ...
-]
-
-...
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.environ.get('DATABASE_DIR', BASE_DIR / 'db.sqlite3'),
-    }
-}
-
-...
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-...
-```
-
-## Step 4: Setup your database volume and configure your settings
-
-then run
-
-    $ chmod +x run.sh 
-    $ fly volumes create -r syd --size 1 dbvol 
-            ID: vol_w0enxv3x86wv8okp
-          Name: dbvol
-           App: rough-brook-8273
-        Region: syd
-          Zone: 2958
-       Size GB: 1
-     Encrypted: true
-    Created at: 20 Jan 23 04:15 UTC
-
-    $ flyctl secrets set DATABASE_DIR='/dbvol/db.sqlite3'
-    Secrets are staged for the first deployment%   
-    $ flyctl secrets set DJANGO_SUPERUSER_USERNAME='admin'
-    Secrets are staged for the first deployment%   
-    $ flyctl secrets set DJANGO_SUPERUSER_EMAIL='ben@notmyemail.org'
-    Secrets are staged for the first deployment%   
-    $ flyctl secrets set DJANGO_SUPERUSER_PASSWORD='very_secure_password'
-    Secrets are staged for the first deployment%   
-
-## Step 5: Check it works!
-
-    $ fly deploy
-    $ fly open
-
-## Step 6: Add CORS
-
-update `requirements.txt`
-
-```
-...
-django-cors-headers==3.11.0
-```
-
-update your virtual environment 
-
-    $ pip install -r requirements.txt
-
-update `settings.py`
-
-```python
-
-...
-
-ALLOWED_HOSTS = ['rough-brook-8273.fly.dev']
-CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']
-
-...
-
-INSTALLED_APPS = [
-     'projects.apps.ProjectsConfig',
-     'rest_framework',
-     'rest_framework.authtoken',
-     'corsheaders',
-     'django.contrib.admin',
-     ...
-]
-
-...
-
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    ...
-]
-
-...
-```
-
-## Step 7: check it works
-
-    $ fly deploy
-    ==> Verifying app config
-    ...
-    $ fly open
-
-## Step 8: clean up your environment
-
-    $ flyctl secrets set DJANGO_DEBUG=False
-    Release v3 created
-    ...
-    $ flyctl secrets set DJANGO_SECRET_KEY='<your-secret-key>'
-    Release v4 created
-    ...
