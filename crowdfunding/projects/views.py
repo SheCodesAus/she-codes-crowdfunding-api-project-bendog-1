@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 from rest_framework import status, generics, permissions
+from rest_framework.settings import api_settings
 
 
 from .models import Project, Pledge
@@ -16,9 +17,18 @@ class ProjectList(APIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
+    filter_backends = api_settings.DEFAULT_FILTER_BACKENDS  # this is DRF magic to get the defaults from settings.py
+    filterset_fields = ['owner__username', 'is_open']
+
+    def filter_queryset(self, queryset):
+        """ this is a copy of what the generic views do """
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
 
     def get(self, request):
         projects = Project.objects.all()
+        projects = self.filter_queryset(projects)
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
