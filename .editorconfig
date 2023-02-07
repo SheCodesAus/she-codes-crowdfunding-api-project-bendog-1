@@ -1,0 +1,39 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# python
+[*.py]
+indent_size = 4
+tab_width = 4
+
+# javascript
+[*.js{,on,x}]
+indent_size = 2
+tab_width = 2
+
+# HTML
+[*.{css,html,htm}]
+indent_size = 2
+tab_width = 2
+
+# mark down
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+tab_width = 2
+
+# shell scripts
+[{*.bash,*.sh,*.zsh}]
+indent_size = 2
+tab_width = 2
+
+# config files
+[*.{toml,yml,yaml}]
+indent_size = 2
+tab_width = 2
