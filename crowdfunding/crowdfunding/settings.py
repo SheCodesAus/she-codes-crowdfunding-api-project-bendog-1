@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG') != 'False'
 
-ALLOWED_HOSTS = ['rough-brook-8273.fly.dev']
+ALLOWED_HOSTS = ['rough-brook-8273.fly.dev', 'localhost', '127.0.0.1',]
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']
 
@@ -37,6 +37,7 @@ CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']
 
 INSTALLED_APPS = [
     'projects.apps.ProjectsConfig',
+    'mentor.apps.MentorConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
