@@ -1,10 +1,10 @@
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics, permissions
 
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, CustomUserDetailSerializer
 
 
 class CustomUserList(APIView):
@@ -35,4 +35,14 @@ class CustomUserDetail(APIView):
         return Response(serializer.data)
         
 
+class WhoAmIDetail(generics.RetrieveAPIView):
+    """ a detail view specifically to show the info for the logged in user """
+    
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CustomUserDetailSerializer
+
+    def get_object(self):
+        """ get the logged in user from the request """
+        return self.request.user
+    
 
