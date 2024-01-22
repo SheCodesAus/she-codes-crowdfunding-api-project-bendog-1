@@ -1,14 +1,13 @@
 from django.http import Http404
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import CustomUser
 from .serializers import CustomUserSerializer
 
 
 class CustomUserList(APIView):
-
     def get(self, request):
         users = CustomUser.objects.all()
         serializer = CustomUserSerializer(users, many=True)
@@ -21,8 +20,8 @@ class CustomUserList(APIView):
             return Response(serializer.data)
         return Response(serializer.errors)
 
-class CustomUserDetail(APIView):
 
+class CustomUserDetail(APIView):
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk)
@@ -33,6 +32,3 @@ class CustomUserDetail(APIView):
         user = self.get_object(pk)
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
-        
-
-

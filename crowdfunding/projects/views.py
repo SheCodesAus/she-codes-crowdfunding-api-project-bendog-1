@@ -1,21 +1,18 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.http import Http404
-from rest_framework import status, generics, permissions
+from django.shortcuts import render
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-
-from .models import Project, Pledge
+from .models import Pledge, Project
 from .permissions import IsOwnerOrReadOnly
-from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer
+from .serializers import (PledgeSerializer, ProjectDetailSerializer,
+                          ProjectSerializer)
 
 
 # Create your views here.
 class ProjectList(APIView):
-
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
-    ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request):
         projects = Project.objects.all()
@@ -29,12 +26,9 @@ class ProjectList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ProjectDetail(APIView):
 
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly
-    ]
+class ProjectDetail(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -57,6 +51,7 @@ class ProjectDetail(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+
 
 class PledgeList(generics.ListCreateAPIView):
     queryset = Pledge.objects.all()
